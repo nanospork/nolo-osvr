@@ -268,7 +268,12 @@ class NoloDevice {
         axis_value = 2*((int)data[touchy])/255.0 -1;
         axis_value *= -1;
         osvrDeviceAnalogSetValueTimestamped(m_dev, m_analog, axis_value, idx*NUM_AXIS+1, &m_lastreport_time);
-      }
+	  }
+	  else {
+		  axis_value = 0;
+		  osvrDeviceAnalogSetValueTimestamped(m_dev, m_analog, axis_value, idx*NUM_AXIS + 0, &m_lastreport_time);
+		  osvrDeviceAnalogSetValueTimestamped(m_dev, m_analog, axis_value, idx*NUM_AXIS + 1, &m_lastreport_time);
+	  }
       // trigger (emulated analog axis)
       osvrDeviceAnalogSetValueTimestamped(m_dev, m_analog, trigger_pressed, idx*NUM_AXIS+2, &m_lastreport_time);
       // battery level
