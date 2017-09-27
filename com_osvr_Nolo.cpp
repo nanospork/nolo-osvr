@@ -269,7 +269,7 @@ class NoloDevice {
         axis_value *= -1;
         osvrDeviceAnalogSetValueTimestamped(m_dev, m_analog, axis_value, idx*NUM_AXIS+1, &m_lastreport_time);
 	  }
-	  else {
+	  else { // Otherwise, report a centered value
 		  axis_value = 0;
 		  osvrDeviceAnalogSetValueTimestamped(m_dev, m_analog, axis_value, idx*NUM_AXIS + 0, &m_lastreport_time);
 		  osvrDeviceAnalogSetValueTimestamped(m_dev, m_analog, axis_value, idx*NUM_AXIS + 1, &m_lastreport_time);
@@ -304,6 +304,15 @@ class NoloDevice {
       decodePosition(data+position, &hmd.translation);
       decodePosition(data+homeposition, &home);
       decodeOrientation(data+orientation, &hmd.rotation);
+
+	  // Send button press if home position changed
+	  static OSVR_Vec3 lastHome;
+	  if (home.data[0] != lastHome.data[0]) { // An exact comparison on the x value is probably sufficient
+		  osvrDeviceButtonSetValueTimestamped(m_dev, m_button, OSVR_BUTTON_PRESSED, 12, &m_lastreport_time);
+	  }
+	  else {
+		  osvrDeviceButtonSetValueTimestamped(m_dev, m_button, OSVR_BUTTON_NOT_PRESSED, 12, &m_lastreport_time);
+	  }
 
       // Tracker viewer kept using the home for head.
       // Something wrong with how they handle the descriptors. 

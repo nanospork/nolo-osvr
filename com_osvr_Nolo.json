@@ -69,7 +69,8 @@
   "semantic": {
     "hmd": {
       "$target": "tracker/1",
-      "home": "tracker/0"
+        "home": "tracker/0",
+        "button": "button/12"
     },
     "controller": {
       "left": {
