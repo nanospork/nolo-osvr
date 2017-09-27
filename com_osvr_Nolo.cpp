@@ -306,9 +306,9 @@ class NoloDevice {
       decodeOrientation(data+orientation, &hmd.rotation);
 
 	  // Send button press if home position changed
-	  static OSVR_Vec3 lastHome;
-	  if (home.data[0] != lastHome.data[0]) { // An exact comparison on the x value is probably sufficient
+	  if (home.data[0] != m_last_home.data[0]) { // An exact comparison on the x value is probably sufficient, if not necessarily proper
 		  osvrDeviceButtonSetValueTimestamped(m_dev, m_button, OSVR_BUTTON_PRESSED, 12, &m_lastreport_time);
+		  m_last_home.data[0] = home.data[0];
 	  }
 	  else {
 		  osvrDeviceButtonSetValueTimestamped(m_dev, m_button, OSVR_BUTTON_NOT_PRESSED, 12, &m_lastreport_time);
@@ -343,6 +343,7 @@ class NoloDevice {
     OSVR_ButtonDeviceInterface m_button;
     OSVR_TrackerDeviceInterface m_tracker;
     OSVR_TimeValue m_lastreport_time;
+	OSVR_Vec3 m_last_home;
 };
 
 class HardwareDetection {
