@@ -63,8 +63,8 @@ namespace {
   };
   #endif
   
-static int NUM_AXIS    = 4;
-static int NUM_BUTTONS = 6;
+const static int NUM_AXIS    = 4;
+const static int NUM_BUTTONS = 6;
 class NoloDevice {
   public:
     NoloDevice(OSVR_PluginRegContext ctx,
@@ -262,11 +262,29 @@ class NoloDevice {
       double axis_value;
       if (data[touchid]) {  // Only report touch if there is one
         axis_value = 2*data[touchx]/255.0 - 1;
+		// Attempt to calibrate, assuming trackpads are only good out to about 60%
+		axis_value *= 1.6667;
+		axis_value = std::fmax(-1, std::fmin(axis_value, 1));
         // invert axis
         axis_value *= -1;
+		// Fix edge case by guessing appropriate value (necessary because touchid apparently doesn't always work)
+		if (data[touchx] == 0) { 
+			axis_value = m_last_axis[idx*NUM_AXIS + 0] < 0 ? -1 : 1;
+		}
+		m_last_axis[idx*NUM_AXIS + 0] = axis_value;
         osvrDeviceAnalogSetValueTimestamped(m_dev, m_analog, axis_value,   idx*NUM_AXIS+0, &m_lastreport_time);
+
         axis_value = 2*((int)data[touchy])/255.0 -1;
+		// Attempt to calibrate, assuming trackpads are only good out to about 60%
+		axis_value *= 1.6667;
+		axis_value = std::fmax(-1, std::fmin(axis_value, 1));
+		// invert axis
         axis_value *= -1;
+		// Fix edge case by guessing appropriate value (necessary because touchid apparently doesn't always work)
+		if (data[touchy] == 0) {
+			axis_value = m_last_axis[idx*NUM_AXIS + 1] < 0 ? -1 : 1;
+		}
+		m_last_axis[idx*NUM_AXIS + 1] = axis_value;
         osvrDeviceAnalogSetValueTimestamped(m_dev, m_analog, axis_value, idx*NUM_AXIS+1, &m_lastreport_time);
 	  }
 	  else { // Otherwise, report a centered value
@@ -344,6 +362,7 @@ class NoloDevice {
     OSVR_TrackerDeviceInterface m_tracker;
     OSVR_TimeValue m_lastreport_time;
 	OSVR_Vec3 m_last_home;
+	double m_last_axis[NUM_AXIS];
 };
 
 class HardwareDetection {
