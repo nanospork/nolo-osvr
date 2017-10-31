@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(NoloOSVRPlugin) # Change this line.
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # So we can find our FindHIDAPI.cmake file
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${LOCAL_CMAKE_MODULE_DIR}")
 
