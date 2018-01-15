@@ -211,7 +211,7 @@ namespace {
 			osvrVec3SetZ(lin_vel, scale *          (data[4] << 8 | data[5]));
 		}
 		void decodeAcceleration(const unsigned char *data,
-			OSVR_LinearVelocityState *lin_accel) {
+			OSVR_LinearAccelerationState *lin_accel) {
 			const double scale = 0.0001;
 			osvrVec3SetX(lin_accel, scale * (int16_t)(data[0] << 8 | data[1]));
 			osvrVec3SetY(lin_accel, scale * (int16_t)(data[2] << 8 | data[3]));
