@@ -9,7 +9,11 @@
       "bounded": true,
       "position": true,
       "orientation": true,
-      "count": 4,
+      "linearVelocity":  true,
+      "angularVelocity":  true,
+      "linearAcceleration":  true,
+      "angularAcceleration":  true, 
+      "count": 8,
       "traits": [{"orientation": false}]
     },
     "analog": {
