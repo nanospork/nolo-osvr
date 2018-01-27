@@ -25,13 +25,27 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 # sets up include dirs, libraries, and naming convention (no leading "lib")
 # for an OSVR plugin. It also installs the plugin into the right directory.
 # Pass as many source files as you need. See osvrAddPlugin.cmake for full docs.
-osvr_add_plugin(NAME com_osvr_Nolo
-    CPP # indicates we'd like to use the C++ wrapper
-    SOURCES
-    com_osvr_Nolo.cpp
-    "${CMAKE_CURRENT_BINARY_DIR}/com_osvr_Nolo_json.h")
+if (WIN32)
+	osvr_add_plugin(NAME com_osvr_Nolo
+		CPP # indicates we'd like to use the C++ wrapper
+		SOURCES
+		com_osvr_Nolo_win.cpp
+		"${CMAKE_CURRENT_BINARY_DIR}/com_osvr_Nolo_json.h")
+	# If you use other libraries, find them and add a line like:
+	find_path(NOLO_API_INCLUDE nolo_api.h)
+	include_directories("${NOLO_API_INCLUDE}")
+	find_library(NOLO_API_LIBRARY NoLo_USBHID.lib)
+	target_link_libraries(com_osvr_Nolo "${NOLO_API_LIBRARY}")
+else ()
+	osvr_add_plugin(NAME com_osvr_Nolo
+		CPP # indicates we'd like to use the C++ wrapper
+		SOURCES
+		com_osvr_Nolo.cpp
+		"${CMAKE_CURRENT_BINARY_DIR}/com_osvr_Nolo_json.h")
+	# If you use other libraries, find them and add a line like:
+	find_package(HIDAPI REQUIRED)
+	include_directories("${HIDAPI_INCLUDE_DIRS}")
+	target_link_libraries(com_osvr_Nolo "${HIDAPI_LIBRARIES}")
+endif ()
 
-# If you use other libraries, find them and add a line like:
-find_package(HIDAPI REQUIRED)
-include_directories("${HIDAPI_INCLUDE_DIRS}")
-target_link_libraries(com_osvr_Nolo "${HIDAPI_LIBRARIES}")
+
