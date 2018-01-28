@@ -140,15 +140,15 @@ namespace {
 			}
 
 			osvrTimeValueGetNow(&device.m_lastreport_time);
-			static int i = 0;
-			if (i > 1000) {
-				std::cout << device.m_lastreport_time.seconds << " " << device.m_lastreport_time.microseconds << "\n";
-				std::cout << data.right_Controller_Data.vecVelocity.x << "," << data.right_Controller_Data.vecVelocity.y << "," << data.right_Controller_Data.vecVelocity.z << "\n";
-				std::cout << data.left_Controller_Data.vecVelocity.x << "," << data.left_Controller_Data.vecVelocity.y << "," << data.left_Controller_Data.vecVelocity.z << "\n";
-				std::cout.flush();
-				i = 0;
-			}
-			++i;
+			//static int i = 0;
+			//if (i > 1000) {
+			//	std::cout << device.m_lastreport_time.seconds << " " << device.m_lastreport_time.microseconds << "\n";
+			//	std::cout << data.right_Controller_Data.vecVelocity.x << "," << data.right_Controller_Data.vecVelocity.y << "," << data.right_Controller_Data.vecVelocity.z << "\n";
+			//	std::cout << data.left_Controller_Data.vecVelocity.x << "," << data.left_Controller_Data.vecVelocity.y << "," << data.left_Controller_Data.vecVelocity.z << "\n";
+			//	std::cout.flush();
+			//	i = 0;
+			//}
+			//++i;
 
 			double translationScale = 1.0f;
 
@@ -218,19 +218,6 @@ namespace {
 			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, leftTrigger, 2, &device.m_lastreport_time);
 			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, rightTrigger, 6, &device.m_lastreport_time);
 
-			/*OSVR_ButtonState buttonValues[12];
-
-			for (unsigned int i = 0; i < 5; ++i) {
-				buttonValues[i] = ((leftButtons & (2 ^ i)) == (2 ^ i)) ? OSVR_BUTTON_PRESSED : OSVR_BUTTON_NOT_PRESSED;
-			}
-			for (unsigned int i = 6; i < 11; ++i) {
-				unsigned int j = i - 6;
-				buttonValues[i] = ((rightButtons & (2 ^ j)) == (2 ^ j)) ? OSVR_BUTTON_PRESSED : OSVR_BUTTON_NOT_PRESSED;
-			}
-			buttonValues[5] = data.left_Controller_Data.ControllerTouched;
-			buttonValues[11] = data.right_Controller_Data.ControllerTouched;
-			osvrDeviceButtonSetValuesTimestamped(device.m_dev, device.m_button, buttonValues, 12, &device.m_lastreport_time);*/
-
 			/*
 			Report Analog Touchpad
 			*/
@@ -286,7 +273,7 @@ namespace {
 			double velocityScale = 1.0f;
 			osvrVec3SetX(&vel.linearVelocity, velocityScale * data.x);
 			osvrVec3SetY(&vel.linearVelocity, velocityScale * data.y);
-			osvrVec3SetZ(&vel.linearVelocity, velocityScale * -data.z);
+			osvrVec3SetZ(&vel.linearVelocity, velocityScale * data.z);
 			vel.linearVelocityValid = true;
 		}
 
