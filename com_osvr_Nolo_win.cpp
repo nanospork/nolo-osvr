@@ -97,12 +97,18 @@ namespace {
 			NOLO::registerDisConnectCallBack(disconnectNolo, this);
 			NOLO::registerConnectSuccessCallBack(connectNolo, this);
 			NOLO::registerExpandDataNotifyCallBack(expandDataNotify, this);
-			NOLO::registerNoloDataNotifyCallBack(noloDataNotify, this);
+			// Switch to polling structure to avoid strange SteamVR bug.
+			//NOLO::registerNoloDataNotifyCallBack(noloDataNotify, this);
 			NOLO::search_Nolo_Device();
 		}
 		~NoloDevice() {
 			std::cout << "Nolo: deleting " << this << std::endl;
 			NOLO::close_Nolo_Device();
+		}
+		OSVR_ReturnCode update() {
+			// Switch to polling structure to avoid strange SteamVR bug.
+			noloDataNotify(NOLO::get_Nolo_NoloData(), this);
+			return OSVR_RETURN_SUCCESS;
 		}
 
 		static void disconnectNolo(void* context) {
@@ -128,14 +134,14 @@ namespace {
 			}
 
 			osvrTimeValueGetNow(&device.m_lastreport_time);
-			static int i = 0;
-			if (i > 10) {
-				std::cout << device.m_lastreport_time.seconds << " " << device.m_lastreport_time.microseconds << "\n";
-				std::cout << data.hmdData.HMDPosition.x << "," << data.hmdData.HMDPosition.y << "," << data.hmdData.HMDPosition.z << "\n";
-				std::cout.flush();
-				i = 0;
-			}
-			++i;
+			//static int i = 0;
+			//if (i > 10000) {
+			//	std::cout << device.m_lastreport_time.seconds << " " << device.m_lastreport_time.microseconds << "\n";
+			//	std::cout << data.hmdData.HMDPosition.x << "," << data.hmdData.HMDPosition.y << "," << data.hmdData.HMDPosition.z << "\n";
+			//	std::cout.flush();
+			//	i = 0;
+			//}
+			//++i;
 
 			double translationScale = 1.0f;
 
@@ -149,13 +155,13 @@ namespace {
 
 			device.SetPosition(home, data.hmdData.HMDInitPosition);
 			device.SetPose(hmd, data.hmdData.HMDPosition, data.hmdData.HMDRotation);
-			//device.SetVelocity(hmdVel, data.hmdData.vecVelocity, data.hmdData.vecAngularVelocity);
-			//device.SetAcceleration(hmdAcc, data.hmdData.vecAcceleration, data.hmdData.vecAngularAcceleration);
+			device.SetVelocity(hmdVel, data.hmdData.vecVelocity, data.hmdData.vecAngularVelocity);
+			device.SetAcceleration(hmdAcc, data.hmdData.vecAcceleration, data.hmdData.vecAngularAcceleration);
 
 			osvrDeviceTrackerSendPositionTimestamped(device.m_dev, device.m_tracker, &home, 0, &device.m_lastreport_time);
 			osvrDeviceTrackerSendPoseTimestamped(device.m_dev, device.m_tracker, &hmd, 1, &device.m_lastreport_time);
-			//osvrDeviceTrackerSendVelocityTimestamped(device.m_dev, device.m_tracker, &hmdVel, 1, &device.m_lastreport_time);
-			//osvrDeviceTrackerSendAccelerationTimestamped(device.m_dev, device.m_tracker, &hmdAcc, 1, &device.m_lastreport_time);
+			osvrDeviceTrackerSendVelocityTimestamped(device.m_dev, device.m_tracker, &hmdVel, 1, &device.m_lastreport_time);
+			osvrDeviceTrackerSendAccelerationTimestamped(device.m_dev, device.m_tracker, &hmdAcc, 1, &device.m_lastreport_time);
 
 			///*
 			//Report Controller Pose
@@ -169,20 +175,20 @@ namespace {
 			OSVR_AccelerationState rightAcc;
 
 			device.SetPose(leftController, data.left_Controller_Data.ControllerPosition, data.left_Controller_Data.ControllerRotation);
-			//device.SetVelocity(leftVel, data.left_Controller_Data.vecVelocity, data.left_Controller_Data.vecAngularVelocity);
-			//device.SetAcceleration(leftAcc, data.left_Controller_Data.vecAcceleration, data.left_Controller_Data.vecAngularAcceleration);
+			device.SetVelocity(leftVel, data.left_Controller_Data.vecVelocity, data.left_Controller_Data.vecAngularVelocity);
+			device.SetAcceleration(leftAcc, data.left_Controller_Data.vecAcceleration, data.left_Controller_Data.vecAngularAcceleration);
 
 			osvrDeviceTrackerSendPoseTimestamped(device.m_dev, device.m_tracker, &leftController, 2, &device.m_lastreport_time);
-			//osvrDeviceTrackerSendVelocityTimestamped(device.m_dev, device.m_tracker, &leftVel, 2, &device.m_lastreport_time);
-			//osvrDeviceTrackerSendAccelerationTimestamped(device.m_dev, device.m_tracker, &leftAcc, 2, &device.m_lastreport_time);
+			osvrDeviceTrackerSendVelocityTimestamped(device.m_dev, device.m_tracker, &leftVel, 2, &device.m_lastreport_time);
+			osvrDeviceTrackerSendAccelerationTimestamped(device.m_dev, device.m_tracker, &leftAcc, 2, &device.m_lastreport_time);
 
 			device.SetPose(rightController, data.right_Controller_Data.ControllerPosition, data.right_Controller_Data.ControllerRotation);
-			//device.SetVelocity(rightVel, data.right_Controller_Data.vecVelocity, data.right_Controller_Data.vecAngularVelocity);
-			//device.SetAcceleration(rightAcc, data.right_Controller_Data.vecAcceleration, data.right_Controller_Data.vecAngularAcceleration);
+			device.SetVelocity(rightVel, data.right_Controller_Data.vecVelocity, data.right_Controller_Data.vecAngularVelocity);
+			device.SetAcceleration(rightAcc, data.right_Controller_Data.vecAcceleration, data.right_Controller_Data.vecAngularAcceleration);
 
 			osvrDeviceTrackerSendPoseTimestamped(device.m_dev, device.m_tracker, &rightController, 3, &device.m_lastreport_time);
-			//osvrDeviceTrackerSendVelocityTimestamped(device.m_dev, device.m_tracker, &rightVel, 3, &device.m_lastreport_time);
-			//osvrDeviceTrackerSendAccelerationTimestamped(device.m_dev, device.m_tracker, &rightAcc, 3, &device.m_lastreport_time);
+			osvrDeviceTrackerSendVelocityTimestamped(device.m_dev, device.m_tracker, &rightVel, 3, &device.m_lastreport_time);
+			osvrDeviceTrackerSendAccelerationTimestamped(device.m_dev, device.m_tracker, &rightAcc, 3, &device.m_lastreport_time);
 
 			/*
 			Report Buttons
@@ -297,10 +303,6 @@ namespace {
 			osvrQuatSetZ(&acc.angularAcceleration.incrementalRotation, angularAccelerationScale * -j);
 			acc.angularAcceleration.dt = angularAcceleartionDt;
 			acc.angularAccelerationValid = true;
-		}
-
-		OSVR_ReturnCode update() {
-			return OSVR_RETURN_SUCCESS;
 		}
 
 		// Sets vibration strength in percent
