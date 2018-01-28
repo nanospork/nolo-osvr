@@ -134,14 +134,15 @@ namespace {
 			}
 
 			osvrTimeValueGetNow(&device.m_lastreport_time);
-			//static int i = 0;
-			//if (i > 10000) {
-			//	std::cout << device.m_lastreport_time.seconds << " " << device.m_lastreport_time.microseconds << "\n";
-			//	std::cout << data.hmdData.HMDPosition.x << "," << data.hmdData.HMDPosition.y << "," << data.hmdData.HMDPosition.z << "\n";
-			//	std::cout.flush();
-			//	i = 0;
-			//}
-			//++i;
+			static int i = 0;
+			if (i > 1000) {
+				std::cout << device.m_lastreport_time.seconds << " " << device.m_lastreport_time.microseconds << "\n";
+				std::cout << data.right_Controller_Data.vecVelocity.x << "," << data.right_Controller_Data.vecVelocity.y << "," << data.right_Controller_Data.vecVelocity.z << "\n";
+				std::cout << data.left_Controller_Data.vecVelocity.x << "," << data.left_Controller_Data.vecVelocity.y << "," << data.left_Controller_Data.vecVelocity.z << "\n";
+				std::cout.flush();
+				i = 0;
+			}
+			++i;
 
 			double translationScale = 1.0f;
 
