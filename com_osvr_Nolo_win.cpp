@@ -195,7 +195,23 @@ namespace {
 			*/
 			unsigned int leftButtons = data.left_Controller_Data.Buttons;
 			unsigned int rightButtons = data.right_Controller_Data.Buttons;
-			OSVR_ButtonState buttonValues[12];
+			int leftTrigger = 0;
+			int rightTrigger = 0;
+
+			for (unsigned int bid = 0; bid < 5; ++bid) {
+				OSVR_ButtonState leftValue = leftButtons & 1 << bid ? OSVR_BUTTON_PRESSED : OSVR_BUTTON_NOT_PRESSED;
+				OSVR_ButtonState rightValue = rightButtons & 1 << bid ? OSVR_BUTTON_PRESSED : OSVR_BUTTON_NOT_PRESSED;
+				if (bid == 1) {
+					leftTrigger = (int)leftValue;
+					rightTrigger = (int)rightValue;
+				}
+				osvrDeviceButtonSetValueTimestamped(device.m_dev, device.m_button, leftValue, bid, &device.m_lastreport_time);
+				osvrDeviceButtonSetValueTimestamped(device.m_dev, device.m_button, rightValue, bid+6, &device.m_lastreport_time);
+			}
+			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, leftTrigger, 2, &device.m_lastreport_time);
+			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, rightTrigger, 6, &device.m_lastreport_time);
+
+			/*OSVR_ButtonState buttonValues[12];
 
 			for (unsigned int i = 0; i < 5; ++i) {
 				buttonValues[i] = leftButtons & (2 ^ i) == (2 ^ i);
@@ -206,7 +222,7 @@ namespace {
 			}
 			buttonValues[5] = data.left_Controller_Data.ControllerTouched;
 			buttonValues[11] = data.right_Controller_Data.ControllerTouched;
-			osvrDeviceButtonSetValuesTimestamped(device.m_dev, device.m_button, buttonValues, 12, &device.m_lastreport_time);
+			osvrDeviceButtonSetValuesTimestamped(device.m_dev, device.m_button, buttonValues, 12, &device.m_lastreport_time);*/
 
 			/*
 			Report Analog Touchpad
@@ -249,13 +265,13 @@ namespace {
 			double translationScale = 1.0f;
 			osvrVec3SetX(&pos, translationScale * data.x);
 			osvrVec3SetY(&pos, translationScale * data.y);
-			osvrVec3SetZ(&pos, translationScale * data.z);
+			osvrVec3SetZ(&pos, translationScale * -data.z);
 		}
 
 		void SetRotation(OSVR_Quaternion& quat, NOLO::Quaternion& data) {
 			osvrQuatSetW(&quat, data.w);
-			osvrQuatSetX(&quat, data.x);
-			osvrQuatSetY(&quat, data.y);
+			osvrQuatSetX(&quat, -data.x);
+			osvrQuatSetY(&quat, -data.y);
 			osvrQuatSetZ(&quat, data.z);
 		}
 
@@ -263,7 +279,7 @@ namespace {
 			double velocityScale = 1.0f;
 			osvrVec3SetX(&vel.linearVelocity, velocityScale * data.x);
 			osvrVec3SetY(&vel.linearVelocity, velocityScale * data.y);
-			osvrVec3SetZ(&vel.linearVelocity, velocityScale * data.z);
+			osvrVec3SetZ(&vel.linearVelocity, velocityScale * -data.z);
 			vel.linearVelocityValid = true;
 		}
 
@@ -286,7 +302,7 @@ namespace {
 			double accelerationScale = 1.0f;
 			osvrVec3SetX(&acc.linearAcceleration, accelerationScale * data.x);
 			osvrVec3SetY(&acc.linearAcceleration, accelerationScale * data.y);
-			osvrVec3SetZ(&acc.linearAcceleration, accelerationScale * data.z);
+			osvrVec3SetZ(&acc.linearAcceleration, accelerationScale * -data.z);
 			acc.linearAccelerationValid = true;
 		}
 
