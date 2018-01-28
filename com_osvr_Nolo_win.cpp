@@ -97,9 +97,15 @@ namespace {
 			NOLO::registerDisConnectCallBack(disconnectNolo, this);
 			NOLO::registerConnectSuccessCallBack(connectNolo, this);
 			NOLO::registerExpandDataNotifyCallBack(expandDataNotify, this);
+
+			// Enable this below for ceiling mode
+			//std::cout << "Nolo: Set CeilingMode" << std::endl; 
+			//NOLO::set_Nolo_PlayMode(NOLO::CeilingMode);
+
 			// Switch to polling structure to avoid strange SteamVR bug.
 			//NOLO::registerNoloDataNotifyCallBack(noloDataNotify, this);
 			NOLO::search_Nolo_Device();
+
 		}
 		~NoloDevice() {
 			std::cout << "Nolo: deleting " << this << std::endl;
@@ -215,11 +221,11 @@ namespace {
 			/*OSVR_ButtonState buttonValues[12];
 
 			for (unsigned int i = 0; i < 5; ++i) {
-				buttonValues[i] = leftButtons & (2 ^ i) == (2 ^ i);
+				buttonValues[i] = ((leftButtons & (2 ^ i)) == (2 ^ i)) ? OSVR_BUTTON_PRESSED : OSVR_BUTTON_NOT_PRESSED;
 			}
 			for (unsigned int i = 6; i < 11; ++i) {
 				unsigned int j = i - 6;
-				buttonValues[i] = rightButtons & (2 ^ j) == (2 ^ j);
+				buttonValues[i] = ((rightButtons & (2 ^ j)) == (2 ^ j)) ? OSVR_BUTTON_PRESSED : OSVR_BUTTON_NOT_PRESSED;
 			}
 			buttonValues[5] = data.left_Controller_Data.ControllerTouched;
 			buttonValues[11] = data.right_Controller_Data.ControllerTouched;
@@ -239,8 +245,8 @@ namespace {
 			/*
 			Report Status
 			*/
-			int leftBattery = (float)data.left_Controller_Data.ControllerBattery / 3.0f;
-			int rightBattery = (float)data.right_Controller_Data.ControllerBattery / 3.0f;
+			float leftBattery = (float)data.left_Controller_Data.ControllerBattery / 3.0f;
+			float rightBattery = (float)data.right_Controller_Data.ControllerBattery / 3.0f;
 			float baseBattery = (float)data.baseStationData.BaseStationPower / 3.0f;
 			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, leftBattery, 3, &device.m_lastreport_time);
 			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, rightBattery, 7, &device.m_lastreport_time);
@@ -325,8 +331,8 @@ namespace {
 		// Sets vibration strength in percent
 		int setVibration(unsigned char left,
 			unsigned char right) {
-			int left_percentage = floor(double(left) / 255.0 * 100.0);
-			int right_percentage = floor(double(right) / 255.0 * 100.0);
+			int left_percentage = (int)(floor(double(left) / 255.0 * 100.0));
+			int right_percentage = (int)(floor(double(right) / 255.0 * 100.0));
 		}
 
 	private:
