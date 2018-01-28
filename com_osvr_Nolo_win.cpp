@@ -94,8 +94,6 @@ namespace {
 			/// Register update callback
 			m_dev.registerUpdateCallback(this);
 
-			memset(&oldreports[0][0], 0, sizeof oldreports);
-
 			NOLO::registerDisConnectCallBack(disconnectNolo, this);
 			NOLO::registerConnectSuccessCallBack(connectNolo, this);
 			NOLO::registerExpandDataNotifyCallBack(expandDataNotify, this);
@@ -130,6 +128,15 @@ namespace {
 			}
 
 			osvrTimeValueGetNow(&device.m_lastreport_time);
+			static int i = 0;
+			if (i > 10) {
+				std::cout << device.m_lastreport_time.seconds << " " << device.m_lastreport_time.microseconds << "\n";
+				std::cout << data.hmdData.HMDPosition.x << "," << data.hmdData.HMDPosition.y << "," << data.hmdData.HMDPosition.z << "\n";
+				std::cout.flush();
+				i = 0;
+			}
+			++i;
+
 			double translationScale = 1.0f;
 
 			/*
@@ -304,11 +311,7 @@ namespace {
 		}
 
 	private:
-		unsigned char oldreports[2][64];
-		static const int controllerLength = 3 + (3 + 4) * 2 + 2 + 2 + 1;
 		osvr::pluginkit::DeviceToken m_dev;
-		//changeme
-		//hid_device* m_hid;
 		bool m_is_nolo_connected;
 		OSVR_AnalogDeviceInterface m_analog;
 		OSVR_ButtonDeviceInterface m_button;
