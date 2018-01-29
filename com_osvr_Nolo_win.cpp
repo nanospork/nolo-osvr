@@ -42,27 +42,6 @@ Nanospork
 // Anonymous namespace to avoid symbol collision
 namespace {
 
-	// btea_decrypt function
-#include "btea.c"
-
-#if 0
-	void hexdump(unsigned char *data, int len) {
-		char fill = std::cout.fill();
-		std::streamsize w = std::cout.width();
-		std::ios_base::fmtflags f = std::cout.flags();
-		for (int i = 0; i<len; i++) {
-			std::cout << std::setw(2) << std::setfill('0')
-				<< std::hex << (int)data[i];
-			if (i % 8 == 7)
-				std::cout << " ";
-		}
-		std::cout << std::endl;
-		std::cout.fill(fill);
-		std::cout.width(w);
-		std::cout.flags(f);
-	};
-#endif
-
 	const static int NUM_AXIS = 4;
 	const static int NUM_BUTTONS = 6;
 	class NoloDevice {
