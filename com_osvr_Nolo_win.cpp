@@ -72,6 +72,9 @@ namespace {
 			OSVR_DeviceInitOptions opts = osvrDeviceCreateInitOptions(ctx);
 
 			std::cout << "Starting nolo-osvr driver.\n";
+
+			m_is_nolo_connected = false;
+			m_new_data_available = false;
 			//changeme
 			//std::cout << "Nolo: opening " << path <<
 			//	" for " << this << std::endl;
@@ -103,7 +106,7 @@ namespace {
 			//NOLO::set_Nolo_PlayMode(NOLO::CeilingMode);
 
 			// Switch to polling structure to avoid strange SteamVR bug.
-			//NOLO::registerNoloDataNotifyCallBack(noloDataNotify, this);
+			NOLO::registerNoloDataNotifyCallBack(noloDataNotify, this);
 			NOLO::search_Nolo_Device();
 
 		}
@@ -113,7 +116,11 @@ namespace {
 		}
 		OSVR_ReturnCode update() {
 			// Switch to polling structure to avoid strange SteamVR bug.
-			noloDataNotify(NOLO::get_Nolo_NoloData(), this);
+			if (m_new_data_available) {
+				m_new_data_available = false;
+				readNewData(NOLO::get_Nolo_NoloData(), this);
+			}
+
 			return OSVR_RETURN_SUCCESS;
 		}
 
@@ -134,6 +141,11 @@ namespace {
 		}
 
 		static void noloDataNotify(NOLO::NoloData data, void* context) {
+			NoloDevice& device = *(NoloDevice*)context;
+			device.m_new_data_available = true;
+		}
+
+		static void readNewData(NOLO::NoloData data, void* context) {
 			NoloDevice& device = *(NoloDevice*)context;
 			if (!device.m_is_nolo_connected) {
 				return;
@@ -325,6 +337,7 @@ namespace {
 	private:
 		osvr::pluginkit::DeviceToken m_dev;
 		bool m_is_nolo_connected;
+		bool m_new_data_available;
 		OSVR_AnalogDeviceInterface m_analog;
 		OSVR_ButtonDeviceInterface m_button;
 		OSVR_TrackerDeviceInterface m_tracker;
