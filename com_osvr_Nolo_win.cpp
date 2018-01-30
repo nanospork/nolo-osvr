@@ -212,14 +212,20 @@ namespace {
 			/*
 			Report Analog Touchpad
 			*/
-			double leftx = data.left_Controller_Data.ControllerTouchAxis.x;
-			double lefty = data.left_Controller_Data.ControllerTouchAxis.y;
-			double rightx = data.right_Controller_Data.ControllerTouchAxis.x;
-			double righty = data.right_Controller_Data.ControllerTouchAxis.y;
-			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, leftx, 0, &device.m_lastreport_time);
-			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, lefty, 1, &device.m_lastreport_time);
-			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, rightx, 4, &device.m_lastreport_time);
-			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, righty, 5, &device.m_lastreport_time);
+			if (data.left_Controller_Data.ControllerTouched){
+				double leftx = data.left_Controller_Data.ControllerTouchAxis.x;
+				double lefty = data.left_Controller_Data.ControllerTouchAxis.y;
+				osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, leftx, 0, &device.m_lastreport_time);
+				osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, lefty, 1, &device.m_lastreport_time);
+			}
+
+			if (data.right_Controller_Data.ControllerTouched){
+				double rightx = data.right_Controller_Data.ControllerTouchAxis.x;
+				double righty = data.right_Controller_Data.ControllerTouchAxis.y;
+				osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, rightx, 4, &device.m_lastreport_time);
+				osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, righty, 5, &device.m_lastreport_time);
+			}
+
 			/*
 			Report Status
 			*/
