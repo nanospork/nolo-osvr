@@ -362,7 +362,7 @@ class NoloDevice {
     OSVR_TrackerDeviceInterface m_tracker;
     OSVR_TimeValue m_lastreport_time;
 	OSVR_Vec3 m_last_home;
-	double m_last_axis[NUM_AXIS];
+	double m_last_axis[2*NUM_AXIS];
 };
 
 class HardwareDetection {
