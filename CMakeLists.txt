@@ -11,21 +11,21 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${LOCAL_CMAKE
 # in the CMake GUI or command line.
 find_package(osvr REQUIRED)
 
-# This generates a header file, from the named json file, containing a string literal
-# named com_osvr_Nolo_json (not null terminated)
-# The file must be added as a source file to some target (as below) to be generated.
-osvr_convert_json(com_osvr_Nolo_json
-    com_osvr_Nolo.json
-    "${CMAKE_CURRENT_BINARY_DIR}/com_osvr_Nolo_json.h")
-
 # Be able to find our generated header file.
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-# This is just a helper function wrapping CMake's add_library command that
-# sets up include dirs, libraries, and naming convention (no leading "lib")
-# for an OSVR plugin. It also installs the plugin into the right directory.
-# Pass as many source files as you need. See osvrAddPlugin.cmake for full docs.
 if (WIN32)
+	# This generates a header file, from the named json file, containing a string literal
+	# named com_osvr_Nolo_json (not null terminated)
+	# The file must be added as a source file to some target (as below) to be generated.
+	osvr_convert_json(com_osvr_Nolo_json
+    	com_osvr_Nolo_win.json
+    	"${CMAKE_CURRENT_BINARY_DIR}/com_osvr_Nolo_json.h")
+
+	# This is just a helper function wrapping CMake's add_library command that
+	# sets up include dirs, libraries, and naming convention (no leading "lib")
+	# for an OSVR plugin. It also installs the plugin into the right directory.
+	# Pass as many source files as you need. See osvrAddPlugin.cmake for full docs.
 	osvr_add_plugin(NAME com_osvr_Nolo
 		CPP # indicates we'd like to use the C++ wrapper
 		SOURCES
@@ -37,6 +37,11 @@ if (WIN32)
 	find_library(NOLO_API_LIBRARY NoLo_USBHID.lib)
 	target_link_libraries(com_osvr_Nolo "${NOLO_API_LIBRARY}")
 else ()
+
+	osvr_convert_json(com_osvr_Nolo_json
+    	com_osvr_Nolo.json
+    	"${CMAKE_CURRENT_BINARY_DIR}/com_osvr_Nolo_json.h")
+
 	osvr_add_plugin(NAME com_osvr_Nolo
 		CPP # indicates we'd like to use the C++ wrapper
 		SOURCES
