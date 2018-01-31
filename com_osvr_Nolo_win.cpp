@@ -54,13 +54,8 @@ namespace {
 
 			m_is_nolo_connected = false;
 			m_new_data_available = false;
-			//changeme
-			//std::cout << "Nolo: opening " << path <<
-			//	" for " << this << std::endl;
 
-			/// Indicate that we'll want 7 analog channels.
-			//osvrDeviceAnalogConfigure(opts, &m_analog, 2*3+1);
-			// update this to 9 analog channels to include the trigger
+			/// Indicate that we'll want 9 analog channels.
 			osvrDeviceAnalogConfigure(opts, &m_analog, NUM_AXIS * 2 + 1);
 			/// And 6 buttons per controller
 			osvrDeviceButtonConfigure(opts, &m_button, 2 * NUM_BUTTONS);
@@ -80,7 +75,7 @@ namespace {
 			NOLO::registerConnectSuccessCallBack(connectNolo, this);
 			NOLO::registerExpandDataNotifyCallBack(expandDataNotify, this);
 
-			// Enable this below for ceiling mode
+			// Celing mode should be taken care of in the OSVR server config!
 			//std::cout << "Nolo: Set CeilingMode" << std::endl; 
 			//NOLO::set_Nolo_PlayMode(NOLO::CeilingMode);
 
@@ -90,7 +85,7 @@ namespace {
 
 		}
 		~NoloDevice() {
-			std::cout << "Nolo: deleting " << this << std::endl;
+			//std::cout << "Nolo: deleting " << this << std::endl;
 			NOLO::close_Nolo_Device();
 		}
 		OSVR_ReturnCode update() {
@@ -106,13 +101,13 @@ namespace {
 		static void disconnectNolo(void* context) {
 			NoloDevice& device = *(NoloDevice*)context;
 			device.m_is_nolo_connected = false;
-			std::cout << "Nolo hardware disconnected.\n";
+			//std::cout << "Nolo hardware disconnected.\n";
 		}
 
 		static void connectNolo(void* context) {
 			NoloDevice& device = *(NoloDevice*)context;
 			device.m_is_nolo_connected = true;
-			std::cout << "Nolo hardware connected.\n";
+			//std::cout << "Nolo hardware connected.\n";
 		}
 
 		static void expandDataNotify(NOLO::ExpandMsgType msgType, void* context) {
@@ -212,18 +207,61 @@ namespace {
 			/*
 			Report Analog Touchpad
 			*/
+			static double m_last_axis[2 * NUM_AXIS];
+			static bool not_touched[2] = { true, true }; 
+
 			if (data.left_Controller_Data.ControllerTouched){
-				double leftx = data.left_Controller_Data.ControllerTouchAxis.x;
-				double lefty = data.left_Controller_Data.ControllerTouchAxis.y;
-				osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, leftx, 0, &device.m_lastreport_time);
-				osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, lefty, 1, &device.m_lastreport_time);
+				float leftx = data.left_Controller_Data.ControllerTouchAxis.x;
+				float lefty = data.left_Controller_Data.ControllerTouchAxis.y;
+				
+				leftx = std::fmax(-1.0, std::fmin(leftx, 1.0));
+				lefty = std::fmax(-1.0, std::fmin(lefty, 1.0));
+
+				if ((m_last_axis[0] != leftx) || (m_last_axis[1] != lefty)){
+					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, leftx, 0, &device.m_lastreport_time);
+					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, lefty, 1, &device.m_lastreport_time);
+				}
+
+				m_last_axis[0] = leftx;
+				m_last_axis[1] = lefty;
+
+				not_touched[0] = true; 
+
+			}
+			else{
+				if (not_touched[0]){
+					// report a centered value if not touched
+					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, 0.0, 0, &device.m_lastreport_time);
+					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, 0.0, 1, &device.m_lastreport_time);
+					not_touched[0] = false; 
+				}
 			}
 
 			if (data.right_Controller_Data.ControllerTouched){
-				double rightx = data.right_Controller_Data.ControllerTouchAxis.x;
-				double righty = data.right_Controller_Data.ControllerTouchAxis.y;
-				osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, rightx, 4, &device.m_lastreport_time);
-				osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, righty, 5, &device.m_lastreport_time);
+				float rightx = data.right_Controller_Data.ControllerTouchAxis.x;
+				float righty = data.right_Controller_Data.ControllerTouchAxis.y;
+
+				rightx = std::fmax(-1.0, std::fmin(rightx, 1.0));
+				righty = std::fmax(-1.0, std::fmin(righty, 1.0));
+
+				if ((m_last_axis[4] != rightx) || (m_last_axis[5] != righty)){
+					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, rightx, 4, &device.m_lastreport_time);
+					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, righty, 5, &device.m_lastreport_time);
+				}
+
+				m_last_axis[4] = rightx;
+				m_last_axis[5] = righty;
+
+				not_touched[1] = true;
+
+			}
+			else{
+				if (not_touched[1]){
+					// report a centered value if not touched
+					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, 0.0, 4, &device.m_lastreport_time);
+					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, 0.0, 5, &device.m_lastreport_time);
+					not_touched[1] = false;
+				}
 			}
 
 			/*
@@ -327,8 +365,7 @@ namespace {
 		OSVR_ButtonDeviceInterface m_button;
 		OSVR_TrackerDeviceInterface m_tracker;
 		OSVR_TimeValue m_lastreport_time;
-		OSVR_Vec3 m_last_home;
-		double m_last_axis[NUM_AXIS];
+		//OSVR_Vec3 m_last_home;
 	};
 
 	class HardwareDetection {
