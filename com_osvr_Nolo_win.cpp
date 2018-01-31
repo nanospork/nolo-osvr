@@ -207,16 +207,13 @@ namespace {
 			/*
 			Report Analog Touchpad
 			*/
-			static double m_last_axis[2 * NUM_AXIS];
+			static double m_last_axis[4] = { 0.0, 0.0, 0.0, 0.0 }; 
 			static bool not_touched[2] = { true, true }; 
 
 			if (data.left_Controller_Data.ControllerTouched){
 				float leftx = data.left_Controller_Data.ControllerTouchAxis.x;
 				float lefty = data.left_Controller_Data.ControllerTouchAxis.y;
 				
-				leftx = std::fmax(-1.0, std::fmin(leftx, 1.0));
-				lefty = std::fmax(-1.0, std::fmin(lefty, 1.0));
-
 				if ((m_last_axis[0] != leftx) || (m_last_axis[1] != lefty)){
 					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, leftx, 0, &device.m_lastreport_time);
 					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, lefty, 1, &device.m_lastreport_time);
@@ -224,7 +221,6 @@ namespace {
 
 				m_last_axis[0] = leftx;
 				m_last_axis[1] = lefty;
-
 				not_touched[0] = true; 
 
 			}
@@ -241,17 +237,13 @@ namespace {
 				float rightx = data.right_Controller_Data.ControllerTouchAxis.x;
 				float righty = data.right_Controller_Data.ControllerTouchAxis.y;
 
-				rightx = std::fmax(-1.0, std::fmin(rightx, 1.0));
-				righty = std::fmax(-1.0, std::fmin(righty, 1.0));
-
-				if ((m_last_axis[4] != rightx) || (m_last_axis[5] != righty)){
+				if ((m_last_axis[2] != rightx) || (m_last_axis[3] != righty)){
 					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, rightx, 4, &device.m_lastreport_time);
 					osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, righty, 5, &device.m_lastreport_time);
 				}
 
-				m_last_axis[4] = rightx;
-				m_last_axis[5] = righty;
-
+				m_last_axis[2] = rightx;
+				m_last_axis[3] = righty;
 				not_touched[1] = true;
 
 			}
