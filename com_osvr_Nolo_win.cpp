@@ -191,7 +191,7 @@ namespace {
 			int leftTrigger = 0;
 			int rightTrigger = 0;
 
-			for (unsigned int bid = 0; bid < 5; ++bid) {
+			for (unsigned int bid = 0; bid < NUM_BUTTONS; ++bid) {
 				OSVR_ButtonState leftValue = leftButtons & 1 << bid ? OSVR_BUTTON_PRESSED : OSVR_BUTTON_NOT_PRESSED;
 				OSVR_ButtonState rightValue = rightButtons & 1 << bid ? OSVR_BUTTON_PRESSED : OSVR_BUTTON_NOT_PRESSED;
 				if (bid == 1) {
@@ -199,7 +199,7 @@ namespace {
 					rightTrigger = (int)rightValue;
 				}
 				osvrDeviceButtonSetValueTimestamped(device.m_dev, device.m_button, leftValue, bid, &device.m_lastreport_time);
-				osvrDeviceButtonSetValueTimestamped(device.m_dev, device.m_button, rightValue, bid+6, &device.m_lastreport_time);
+				osvrDeviceButtonSetValueTimestamped(device.m_dev, device.m_button, rightValue, bid+NUM_BUTTONS, &device.m_lastreport_time);
 			}
 			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, leftTrigger, 2, &device.m_lastreport_time);
 			osvrDeviceAnalogSetValueTimestamped(device.m_dev, device.m_analog, rightTrigger, 6, &device.m_lastreport_time);
