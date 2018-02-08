@@ -9,7 +9,11 @@
       "bounded": true,
       "position": true,
       "orientation": true,
-      "count": 4,
+      "linearVelocity":  true,
+      "angularVelocity":  true,
+      "linearAcceleration":  true,
+      "angularAcceleration":  true, 
+      "count": 8,
       "traits": [{"orientation": false}]
     },
     "analog": {
@@ -18,12 +22,12 @@
         {
           "min": -1,
           "max": 1,
-          "rest": 1
+          "rest": 0
         },
         {
           "min": -1,
           "max": 1,
-          "rest": 1
+          "rest": 0
         },
         {
           "min": 0,
@@ -38,12 +42,12 @@
         {
           "min": -1,
           "max": 1,
-          "rest": 1 
+          "rest": 0 
         },
         {
           "min": -1,
           "max": 1,
-          "rest": 1
+          "rest": 0
         },
         {
           "min": 0,
@@ -63,14 +67,13 @@
       ]
     },
     "button": {
-      "count": 13
+      "count": 12
     }
   },
   "semantic": {
     "hmd": {
       "$target": "tracker/1",
-        "home": "tracker/0",
-        "button": "button/12"
+        "home": "tracker/0"
     },
     "controller": {
       "left": {
